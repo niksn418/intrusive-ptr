@@ -57,7 +57,7 @@ TEST(correctness, ptr_copy_move_ctor) {
   ASSERT_EQ(o->use_count(), 2);
 }
 
-TEST(correctness, thread_safe_check) {
+TEST(correctness, thread_safety_check) {
   /// Num threads to run
   auto N = std::thread::hardware_concurrency();
 

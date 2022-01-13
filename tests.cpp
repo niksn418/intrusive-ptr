@@ -5,6 +5,7 @@
 #include <thread>
 
 struct object : intrusive_ref_counter<object> {};
+struct derived : object {};
 
 TEST(correctness, default_ref_counter_ctor) {
   object o;
@@ -43,6 +44,19 @@ TEST(correctness, ptr_ctor) {
   ASSERT_EQ(o->use_count(), 1);
 }
 
+TEST(correctness, ptr_copy_move_ctor) {
+  auto o = new derived();
+  intrusive_ptr<derived> a(o);
+  ASSERT_EQ(o->use_count(), 1);
+  auto b = a;
+  ASSERT_EQ(o->use_count(), 2);
+  intrusive_ptr<object> c = b;
+  ASSERT_EQ(o->use_count(), 3);
+
+  c = std::move(b);
+  ASSERT_EQ(o->use_count(), 2);
+}
+
 TEST(correctness, thread_safe_check) {
   /// Num threads to run
   auto N = std::thread::hardware_concurrency();
@@ -52,7 +66,7 @@ TEST(correctness, thread_safe_check) {
 
   ASSERT_GT(N, 1);
 
-  auto o = new object();
+  auto o = new derived();
   intrusive_ptr<object> ptr(o);
   std::vector<std::thread> workers;
   for (size_t i = 0; i < N; ++i) {

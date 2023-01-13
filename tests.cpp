@@ -70,7 +70,7 @@ TEST(correctness, thread_safety_check) {
   intrusive_ptr<object> ptr(o);
   std::vector<std::thread> workers;
   for (size_t i = 0; i < N; ++i) {
-    workers.emplace_back([o, N_ctors] () {
+    workers.emplace_back([o, N_ctors]() {
       for (size_t j = 0; j < N_ctors; j++) {
         intrusive_ptr<object> ptr(o);
       }

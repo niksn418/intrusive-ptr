@@ -31,27 +31,40 @@ struct intrusive_ptr {
   }
 
   intrusive_ptr& operator=(intrusive_ptr const& r) {
-    intrusive_ptr(r).swap(*this);
+    if (*this != r) {
+      intrusive_ptr(r).swap(*this);
+    }
     return *this;
   }
   template <class Y>
   requires std::is_convertible_v<Y*, T*> intrusive_ptr&
   operator=(intrusive_ptr<Y> const& r) {
-    intrusive_ptr(r).swap(*this);
+    if (*this != r) {
+      intrusive_ptr(r).swap(*this);
+    }
     return *this;
   }
   intrusive_ptr& operator=(T* r) {
-    intrusive_ptr(r).swap(*this);
+    if (*this != r) {
+      intrusive_ptr(r).swap(*this);
+    }
     return *this;
   }
 
   intrusive_ptr& operator=(intrusive_ptr&& r) {
-    intrusive_ptr(std::move(r)).swap(*this);
+    if (this != &r) {
+      intrusive_ptr(std::move(r)).swap(*this);
+    }
     return *this;
   }
   template <class Y>
   requires std::is_convertible_v<Y*, T*> intrusive_ptr&
   operator=(intrusive_ptr<Y>&& r) {
+    if constexpr (std::is_same_v<Y, T>) {
+      if (this == &r) {
+        return *this;
+      }
+    }
     intrusive_ptr(std::move(r)).swap(*this);
     return *this;
   }
@@ -144,7 +157,9 @@ struct intrusive_ref_counter {
   intrusive_ref_counter() noexcept = default;
   intrusive_ref_counter(const intrusive_ref_counter& v) noexcept {}
 
-  intrusive_ref_counter& operator=(const intrusive_ref_counter& v) noexcept {}
+  intrusive_ref_counter& operator=(const intrusive_ref_counter& v) noexcept {
+    return *this;
+  }
 
   unsigned int use_count() const noexcept {
     return counter.load(std::memory_order_relaxed);

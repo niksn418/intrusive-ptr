@@ -12,25 +12,17 @@ struct intrusive_ptr {
     }
   }
 
-  intrusive_ptr(intrusive_ptr const& r) : pointer(r.get()) {
-    if (pointer != nullptr) {
-      intrusive_ptr_add_ref(pointer);
-    }
-  }
+  intrusive_ptr(intrusive_ptr const& r) : intrusive_ptr(r.get()) {}
 
   template <class Y>
   requires std::is_convertible_v<Y*, T*>
-  intrusive_ptr(intrusive_ptr<Y> const& r) : pointer(r.get()) {
-    if (pointer != nullptr) {
-      intrusive_ptr_add_ref(pointer);
-    }
-  }
+  intrusive_ptr(intrusive_ptr<Y> const& r) : intrusive_ptr(r.get()) {}
 
-  intrusive_ptr(intrusive_ptr&& r)
-      : pointer(std::exchange(r.pointer, nullptr)) {}
+  intrusive_ptr(intrusive_ptr&& r) : pointer(r.detach()) {}
+
   template <class Y>
   requires std::is_convertible_v<Y*, T*> intrusive_ptr(intrusive_ptr<Y>&& r)
-      : pointer(std::exchange(r.pointer, nullptr)) {}
+      : pointer(r.detach()) {}
 
   ~intrusive_ptr() {
     if (pointer != nullptr) {
@@ -149,7 +141,7 @@ void swap(intrusive_ptr<T>& a, intrusive_ptr<T>& b) noexcept {
 
 template <typename T>
 struct intrusive_ref_counter {
-  intrusive_ref_counter() noexcept {}
+  intrusive_ref_counter() noexcept = default;
   intrusive_ref_counter(const intrusive_ref_counter& v) noexcept {}
 
   intrusive_ref_counter& operator=(const intrusive_ref_counter& v) noexcept {}

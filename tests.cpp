@@ -12,6 +12,26 @@ TEST(correctness, default_ref_counter_ctor) {
   ASSERT_EQ(o.use_count(), 0);
 }
 
+TEST(correctness, ref_counter_copy_ctor) {
+  auto a = new object();
+  intrusive_ptr<object> ptr(a);
+  ASSERT_EQ(a->use_count(), 1);
+
+  object b = *a;
+  ASSERT_EQ(b.use_count(), 0);
+}
+
+TEST(correctness, ref_counter_assignment) {
+  auto a = new object();
+  intrusive_ptr<object> ptr1(a);
+  intrusive_ptr<object> ptr2(a);
+  ASSERT_EQ(a->use_count(), 2);
+
+  object b;
+  *a = b;
+  ASSERT_EQ(a->use_count(), 2);
+}
+
 TEST(correctness, default_ptr_ctor) {
   intrusive_ptr<object> ptr;
   ASSERT_EQ(ptr.get(), nullptr);

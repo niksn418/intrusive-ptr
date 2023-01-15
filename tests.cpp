@@ -102,3 +102,57 @@ TEST(correctness, thread_safety_check) {
 
   ASSERT_EQ(o->use_count(), 1);
 }
+
+static_assert(std::is_constructible_v<intrusive_ptr<object>,
+                                      const intrusive_ptr<object>&>);
+static_assert(
+    std::is_constructible_v<intrusive_ptr<object>, intrusive_ptr<object>&&>);
+static_assert(
+    std::is_assignable_v<intrusive_ptr<object>, const intrusive_ptr<object>&>);
+static_assert(
+    std::is_assignable_v<intrusive_ptr<object>, intrusive_ptr<object>&&>);
+
+static_assert(std::is_constructible_v<intrusive_ptr<object>,
+                                      const intrusive_ptr<derived>&>);
+static_assert(
+    std::is_constructible_v<intrusive_ptr<object>, intrusive_ptr<derived>&&>);
+static_assert(
+    std::is_assignable_v<intrusive_ptr<object>, const intrusive_ptr<derived>&>);
+static_assert(
+    std::is_assignable_v<intrusive_ptr<object>, intrusive_ptr<derived>&&>);
+
+static_assert(
+    !std::is_constructible_v<intrusive_ptr<derived>, const intrusive_ptr<object>&>);
+static_assert(
+    !std::is_constructible_v<intrusive_ptr<derived>, intrusive_ptr<object>&&>);
+static_assert(
+    !std::is_assignable_v<intrusive_ptr<derived>, const intrusive_ptr<object>&>);
+static_assert(
+    !std::is_assignable_v<intrusive_ptr<derived>, intrusive_ptr<object>&&>);
+
+static_assert(
+    !std::is_constructible_v<intrusive_ptr<object>, const intrusive_ptr<int>&>);
+static_assert(
+    !std::is_constructible_v<intrusive_ptr<object>, intrusive_ptr<int>&&>);
+static_assert(
+    !std::is_assignable_v<intrusive_ptr<object>, const intrusive_ptr<int>&>);
+static_assert(
+    !std::is_assignable_v<intrusive_ptr<object>, intrusive_ptr<int>&&>);
+
+static_assert(
+    std::is_constructible_v<intrusive_ptr<const int>, const intrusive_ptr<int>&>);
+static_assert(
+    std::is_constructible_v<intrusive_ptr<const int>, intrusive_ptr<int>&&>);
+static_assert(
+    std::is_assignable_v<intrusive_ptr<const int>, const intrusive_ptr<int>&>);
+static_assert(
+    std::is_assignable_v<intrusive_ptr<const int>, intrusive_ptr<int>&&>);
+
+static_assert(
+    !std::is_constructible_v<intrusive_ptr<int>, const intrusive_ptr<const int>&>);
+static_assert(
+    !std::is_constructible_v<intrusive_ptr<int>, intrusive_ptr<const int>&&>);
+static_assert(
+    !std::is_assignable_v<intrusive_ptr<int>, const intrusive_ptr<const int>&>);
+static_assert(
+    !std::is_assignable_v<intrusive_ptr<int>, intrusive_ptr<const int>&&>);
